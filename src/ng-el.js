@@ -34,16 +34,19 @@ io.on('connection', (socket) => {
 	/**
 	 * this will listen to 'enterRoom' event and emit 'room + id' event.
 	 */
-	socket.on('enterRoom', (id) => {
-		join(id);
+	socket.on('enterRoom', (data) => {
+		join(data.id);
 
 		// find the room.
-		const room = rooms.find((room) => id === room.id);
-		console.log('Enter Room :: ', room);
-		console.log('Rooms :: ', rooms);
+		const room = rooms.find((room) => room.id === data.id);
 
 		// emit room event so user can enter
-		socket.emit('room' + id, room);
+		socket.emit('room' + data.id, room);
+
+		// this will broadcast who join the group chat.
+		socket.broadcast.emit('joinRoom' + data.id, data.name);
+
+		console.log(data.name + 'Entered room ::', room);
 	});
 
 	/**
@@ -59,11 +62,7 @@ io.on('connection', (socket) => {
 		room.id = roomId;
 		rooms.push(room);
 
-		// will emit room event so user that create room,
-		// will automatically enter themselves.
-		socket.emit('room' + roomId, room);
-
-		// this will send all the rooms to users connected to this server.
+		// this will send all the rooms to all users connected to this server.
 		io.emit('rooms', rooms);
 
 		console.log('Created Room ::', room);
@@ -92,7 +91,7 @@ io.on('connection', (socket) => {
 
 	// this will emit rooms to all socket,
 	// meanning this will be broadcast by the node server.
-	// note: this is not equall to socket.broadcast.
+	// note: this is not equal to socket.broadcast.
 	io.emit('rooms', rooms);
 });
 
