@@ -44,9 +44,10 @@ io.on('connection', (socket) => {
 		socket.emit('room' + data.id, room);
 
 		// this will broadcast who join the group chat.
-		socket.broadcast.emit('joinRoom' + data.id, data.name);
+		socket.broadcast.emit('join' + data.id, data.name);
 
-		console.log(data.name + 'Entered room ::', room);
+		console.log(data.id);
+		console.log(data.name + ' Entered room ::', room);
 	});
 
 	/**
